@@ -1,0 +1,129 @@
+-- Create USERS table
+CREATE TABLE USERS (
+    user_id NUMBER CONSTRAINT user_pk PRIMARY KEY,
+    user_name VARCHAR2(200),
+    password VARCHAR2(10),
+    role VARCHAR2(200)
+);
+
+-- Create MENU table
+create table MENU (
+    menu_id number constraint menu_pk primary key,
+    name number,
+    price number,
+    description varchar2(500)
+);
+
+
+-- Create ORDER_DETAILS table
+CREATE TABLE ORDER_DETAILS (
+    order_id NUMBER CONSTRAINT order_details_pk PRIMARY KEY,
+    user_id NUMBER,
+    Date_ DATE,
+    total NUMBER,
+    FOREIGN KEY (user_id) REFERENCES USERS(user_id)
+);
+
+-- Create ORDER_ITEM table
+CREATE TABLE ORDER_ITEM (
+    order_item_id NUMBER CONSTRAINT order_item_pk PRIMARY KEY,
+    order_id NUMBER,
+    menu_id NUMBER,
+    quantity NUMBER,
+    unit VARCHAR2(400),
+    FOREIGN KEY (order_id) REFERENCES ORDER_DETAILS(order_id),
+    FOREIGN KEY (menu_id) REFERENCES MENU(menu_id)
+);
+
+-- Create PAYMENT table
+CREATE TABLE PAYMENT (
+    payment_id NUMBER CONSTRAINT payment_pk PRIMARY KEY,
+    order_id NUMBER,
+    amount NUMBER,
+    method VARCHAR2(100),
+    FOREIGN KEY (order_id) REFERENCES ORDER_DETAILS(order_id)
+);
+
+-- Create staff table
+create table STAFF (
+    staff_id number constraint staff_pk primary key,
+    username varchar2(255),
+    password varchar2(255),
+    role varchar2(255)
+);
+
+
+
+-- Insert data into MENU table for beverages
+INSERT INTO MENU VALUES (1, 'Espresso', 2.99, 'Strong black coffee');
+INSERT INTO MENU VALUES (2, 'Americano', 3.49, 'Diluted espresso with hot water');
+INSERT INTO MENU VALUES (3, 'Latte', 4.49, 'Espresso with a lot of steamed milk');
+INSERT INTO MENU VALUES (4, 'Cappuccino', 3.99, 'Espresso with steamed milk and foam');
+INSERT INTO MENU VALUES (5, 'Mocha', 4.99, 'Espresso with steamed milk and chocolate');
+INSERT INTO MENU VALUES (6, 'Flat White', 4.49, 'Espresso with microfoam');
+INSERT INTO MENU VALUES (7, 'Cold Brew', 3.99, 'Cold-steeped coffee');
+INSERT INTO MENU VALUES (8, 'Black Tea', 2.49, 'Classic black tea');
+INSERT INTO MENU VALUES (9, 'Green Tea', 2.49, 'Light and refreshing green tea');
+INSERT INTO MENU VALUES (10, 'Herbal Infusions', 2.99, 'Chamomile, Peppermint, etc.');
+INSERT INTO MENU VALUES (11, 'Chai Latte', 4.99, 'Spiced tea with steamed milk');
+INSERT INTO MENU VALUES (12, 'Classic Hot Chocolate', 3.99, 'Rich and creamy hot chocolate');
+INSERT INTO MENU VALUES (13, 'Dark Chocolate Hot Cocoa', 4.49, 'Hot cocoa made with dark chocolate');
+INSERT INTO MENU VALUES (14, 'White Chocolate Mocha', 4.99, 'Mocha with white chocolate');
+
+-- Insert data into MENU table for iced beverages
+INSERT INTO MENU VALUES (15, 'Iced Coffee', 3.99, 'Chilled coffee over ice');
+INSERT INTO MENU VALUES (16, 'Iced Latte', 4.99, 'Espresso with milk and ice');
+INSERT INTO MENU VALUES (17, 'Iced Tea', 2.99, 'Classic iced tea, sweetened/unsweetened');
+INSERT INTO MENU VALUES (18, 'Cold Brew with Flavored Syrups', 4.99, 'Cold brew with your choice of syrup');
+
+-- Insert data into MENU table for specialty drinks
+INSERT INTO MENU VALUES (19, 'Matcha Latte', 5.49, 'Green tea powder with steamed milk');
+INSERT INTO MENU VALUES (20, 'Turmeric Latte', 5.49, 'Golden milk with turmeric and spices');
+INSERT INTO MENU VALUES (21, 'Golden Milk', 4.99, 'Turmeric-infused warm milk');
+
+-- Insert data into MENU table for breakfast items
+INSERT INTO MENU VALUES (22, 'Avocado Toast', 6.99, 'Toasted bread with mashed avocado and toppings');
+INSERT INTO MENU VALUES (23, 'Veggie Breakfast Burrito', 7.99, 'Burrito with eggs, veggies, and cheese');
+INSERT INTO MENU VALUES (24, 'Greek Yogurt Parfait', 5.99, 'Yogurt with fresh fruits and granola');
+INSERT INTO MENU VALUES (25, 'Oatmeal with Berries and Nuts', 4.99, 'Oatmeal topped with berries and nuts');
+
+-- Insert data into MENU table for sandwiches
+INSERT INTO MENU VALUES (26, 'Caprese Panini', 8.99, 'Panini with mozzarella, tomatoes, and basil');
+INSERT INTO MENU VALUES (27, 'Hummus and Veggie Wrap', 7.99, 'Wrap with hummus and assorted veggies');
+INSERT INTO MENU VALUES (28, 'Grilled Vegetable and Pesto Panini', 9.99, 'Panini with grilled veggies and pesto');
+INSERT INTO MENU VALUES (29, 'Egg Salad Sandwich', 6.99, 'Sandwich with egg salad filling');
+
+-- Insert data into MENU table for salads
+INSERT INTO MENU VALUES (30, 'Greek Salad', 8.99, 'Classic Greek salad with feta and olives');
+INSERT INTO MENU VALUES (31, 'Quinoa Salad with Roasted Vegetables', 9.99, 'Quinoa salad with roasted veggies');
+INSERT INTO MENU VALUES (32, 'Spinach and Strawberry Salad', 7.99, 'Salad with spinach, strawberries, and vinaigrette');
+INSERT INTO MENU VALUES (33, 'Mediterranean Chickpea Salad', 8.99, 'Chickpea salad with Mediterranean flavors');
+
+-- Insert data into MENU table for pastries
+INSERT INTO MENU VALUES (34, 'Spinach and Feta Croissant', 3.99, 'Croissant with spinach and feta filling');
+INSERT INTO MENU VALUES (35, 'Blueberry Muffins', 2.99, 'Classic blueberry muffins');
+INSERT INTO MENU VALUES (36, 'Vegetable-Stuffed Puff Pastry', 4.99, 'Puff pastry with savory vegetable filling');
+INSERT INTO MENU VALUES (37, 'Tomato and Basil Scones', 3.49, 'Scones with tomato and basil');
+
+-- Insert data into MENU table for desserts
+INSERT INTO MENU VALUES (38, 'Fruit Tart', 4.99, 'Tart with assorted fresh fruits');
+INSERT INTO MENU VALUES (39, 'Chocolate Avocado Mousse', 5.99, 'Rich chocolate mousse made with avocado');
+INSERT INTO MENU VALUES (40, 'Vegan Banana Bread', 3.99, 'Banana bread made without animal products');
+INSERT INTO MENU VALUES (41, 'Coconut Milk Rice Pudding', 4.49, 'Creamy rice pudding made with coconut milk');
+
+-- Insert data into MENU table for specials
+INSERT INTO MENU VALUES (42, 'Roasted Butternut Squash Soup', 6.99, 'Fall special soup');
+INSERT INTO MENU VALUES (43, 'Cranberry Orange Scones', 3.99, 'Winter special scones');
+INSERT INTO MENU VALUES (44, 'Iced Tea Lemonade with Fresh Mint', 4.49, 'Summer special iced tea lemonade');
+INSERT INTO MENU VALUES (45, 'Soup of the Day', 5.99, 'Vegetarian daily soup special');
+INSERT INTO MENU VALUES (46, 'Veggie Wrap of the Day', 7.49, 'Daily special veggie wrap');
+INSERT INTO MENU VALUES (47, 'Featured Dessert', 6.99, 'Daily special dessert with vegan and gluten-free options');
+
+-- Insert data into STAFF table
+INSERT INTO STAFF (staff_id, username, password, role)
+VALUES (1, 'john_doe', 'password123', 'Manager');
+
+
+-- Insert data into USERS table
+INSERT INTO USERS (user_id, user_name, password, role)
+VALUES (1, 'john_doe', 'password123', 'Admin');
