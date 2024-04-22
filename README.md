@@ -1,4 +1,4 @@
-Certainly! Here's a brief summary of the Cafeteria Management System implemented in an RDBMS:
+Here's a brief summary of the Cafeteria Management System implemented in an RDBMS:
 
 ---
 
