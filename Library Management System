@@ -1,0 +1,289 @@
+-- Create Authors table
+CREATE TABLE Authors (
+    AuthorID INT PRIMARY KEY,
+    AuthorName VARCHAR(100) NOT NULL
+);
+
+-- Create Books table
+CREATE TABLE Books (
+    BookID INT PRIMARY KEY,
+    Title VARCHAR(255) NOT NULL,
+    ISBN VARCHAR(20) UNIQUE NOT NULL,
+    AuthorID INT,
+    FOREIGN KEY (AuthorID) REFERENCES Authors(AuthorID)
+);
+
+-- Create Members table
+CREATE TABLE Members (
+    MemberID INT PRIMARY KEY,
+    MemberName VARCHAR(100) NOT NULL,
+    Email VARCHAR(100) UNIQUE NOT NULL
+);
+
+-- Create Transactions table
+CREATE TABLE Transactions (
+    TransactionID INT PRIMARY KEY,
+    BookID INT,
+    MemberID INT,
+    CheckoutDate DATE,
+    ReturnDate DATE,
+    FOREIGN KEY (BookID) REFERENCES Books(BookID),
+    FOREIGN KEY (MemberID) REFERENCES Members(MemberID)
+);
+
+-- Create Fines table
+CREATE TABLE Fines (
+    FineID INT PRIMARY KEY,
+    TransactionID INT,
+    Amount DECIMAL(10, 2) NOT NULL,
+    Paid VARCHAR2(20), 
+    FOREIGN KEY (TransactionID) REFERENCES Transactions(TransactionID)
+);
+
+
+
+-- Insert authors
+INSERT INTO Authors (AuthorID, AuthorName) VALUES
+(1, 'George Orwell');
+INSERT INTO Authors (AuthorID, AuthorName) VALUES
+(2, 'J.K. Rowling');
+INSERT INTO Authors (AuthorID, AuthorName) VALUES
+(3, 'William Shakespeare');
+INSERT INTO Authors (AuthorID, AuthorName) VALUES
+(4, 'F. Scott Fitzgerald');
+INSERT INTO Authors (AuthorID, AuthorName) VALUES
+(5, 'Agatha Christie');
+
+-- Insert books
+INSERT INTO Books (BookID, Title, ISBN, AuthorID) VALUES
+(1, '1984', '1234567890', 1);
+INSERT INTO Books (BookID, Title, ISBN, AuthorID) VALUES
+(2, 'Harry Potter and the Philosopher''s Stone', '2345678901', 2);
+INSERT INTO Books (BookID, Title, ISBN, AuthorID) VALUES
+(3, 'Hamlet', '3456789012', 3);
+INSERT INTO Books (BookID, Title, ISBN, AuthorID) VALUES
+(4, 'The Great Gatsby', '4567890123', 4);
+INSERT INTO Books (BookID, Title, ISBN, AuthorID) VALUES
+(5, 'And Then There Were None', '5678901234', 5);
+
+-- Insert members
+INSERT INTO Members (MemberID, MemberName, Email) VALUES
+(1, 'John Doe', 'john.doe@example.com');
+
+INSERT INTO Members (MemberID, MemberName, Email) VALUES
+(2, 'Jane Smith', 'jane.smith@example.com');
+INSERT INTO Members (MemberID, MemberName, Email) VALUES
+(3, 'Mark Johnson', 'mark.johnson@example.com');
+INSERT INTO Members (MemberID, MemberName, Email) VALUES
+(4, 'Emily Williams', 'emily.williams@example.com');
+INSERT INTO Members (MemberID, MemberName, Email) VALUES
+(5, 'Michael Brown', 'michael.brown@example.com');
+
+-- Insert transactions with corrected date format using TO_DATE
+INSERT INTO Transactions (TransactionID, BookID, MemberID, CheckoutDate, ReturnDate) VALUES
+(1, 1, 1, TO_DATE('2022-01-01', 'YYYY-MM-DD'), TO_DATE('2022-01-15', 'YYYY-MM-DD'));
+INSERT INTO Transactions (TransactionID, BookID, MemberID, CheckoutDate, ReturnDate) VALUES
+(2, 2, 2, TO_DATE('2022-01-02', 'YYYY-MM-DD'), TO_DATE('2022-01-16', 'YYYY-MM-DD'));
+INSERT INTO Transactions (TransactionID, BookID, MemberID, CheckoutDate, ReturnDate) VALUES
+(3, 3, 3, TO_DATE('2022-01-03', 'YYYY-MM-DD'), TO_DATE('2022-01-17', 'YYYY-MM-DD'));
+INSERT INTO Transactions (TransactionID, BookID, MemberID, CheckoutDate, ReturnDate) VALUES
+(4, 4, 4, TO_DATE('2022-01-04', 'YYYY-MM-DD'), TO_DATE('2022-01-18', 'YYYY-MM-DD'));
+INSERT INTO Transactions (TransactionID, BookID, MemberID, CheckoutDate, ReturnDate) VALUES
+(5, 5, 5, TO_DATE('2022-01-05', 'YYYY-MM-DD'), TO_DATE('2022-01-19', 'YYYY-MM-DD'));
+
+
+-- Insert fines with FALSE as string
+INSERT INTO Fines (FineID, TransactionID, Amount, Paid) VALUES
+(1, 1, 5.00, 'FALSE');
+INSERT INTO Fines (FineID, TransactionID, Amount, Paid) VALUES
+(2, 2, 4.00, 'FALSE');
+INSERT INTO Fines (FineID, TransactionID, Amount, Paid) VALUES
+(3, 3, 3.00, 'FALSE');
+INSERT INTO Fines (FineID, TransactionID, Amount, Paid) VALUES
+(4, 4, 2.00, 'FALSE');
+INSERT INTO Fines (FineID, TransactionID, Amount, Paid) VALUES
+(5, 5, 1.00, 'FALSE');
+
+-- Create a view for Authors
+CREATE VIEW vw_Authors AS
+SELECT AuthorID, AuthorName
+FROM Authors;
+
+-- Create a view for Books with Author information
+CREATE VIEW vw_Books AS
+SELECT b.BookID, b.Title, b.ISBN, a.AuthorName
+FROM Books b
+JOIN Authors a ON b.AuthorID = a.AuthorID;
+
+-- Create a view for Members
+CREATE VIEW vw_Members AS
+SELECT MemberID, MemberName, Email
+FROM Members;
+
+-- Create a view for Transactions with Book and Member information
+CREATE VIEW vw_Transactions AS
+SELECT t.TransactionID, b.Title AS BookTitle, m.MemberName, t.CheckoutDate, t.ReturnDate
+FROM Transactions t
+JOIN Books b ON t.BookID = b.BookID
+JOIN Members m ON t.MemberID = m.MemberID;
+
+-- Create a view for Fines with Transaction information
+CREATE VIEW vw_Fines AS
+SELECT f.FineID, t.TransactionID, b.Title AS BookTitle, m.MemberName, f.Amount, f.Paid
+FROM Fines f
+JOIN Transactions t ON f.TransactionID = t.TransactionID
+JOIN Books b ON t.BookID = b.BookID
+JOIN Members m ON t.MemberID = m.MemberID;
+
+
+-- Trigger for Authors table: Prevent deletion of authors associated with books
+CREATE TRIGGER trg_PreventAuthorDeletion
+BEFORE DELETE ON Authors
+FOR EACH ROW
+BEGIN
+    DECLARE author_count INT;
+    SELECT COUNT(*) INTO author_count FROM Books WHERE AuthorID = OLD.AuthorID;
+    IF author_count > 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cannot delete an author associated with books.';
+    END IF;
+END;
+
+-- Trigger for Books table: Prevent insertion of books with a non-existent author
+CREATE TRIGGER trg_PreventInvalidAuthor
+BEFORE INSERT ON Books
+FOR EACH ROW
+BEGIN
+    DECLARE author_count INT;
+    SELECT COUNT(*) INTO author_count FROM Authors WHERE AuthorID = NEW.AuthorID;
+    IF author_count = 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cannot insert a book with a non-existent author.';
+    END IF;
+END;
+
+-- Trigger for Members table: Prevent insertion of members with duplicate email
+CREATE TRIGGER trg_PreventDuplicateEmail
+BEFORE INSERT ON Members
+FOR EACH ROW
+BEGIN
+    DECLARE email_count INT;
+    SELECT COUNT(*) INTO email_count FROM Members WHERE Email = NEW.Email;
+    IF email_count > 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cannot insert a member with a duplicate email.';
+    END IF;
+END;
+
+-- Trigger for Transactions table: Set ReturnDate to NULL for ongoing transactions
+CREATE TRIGGER trg_SetReturnDateOnCheckout
+BEFORE INSERT ON Transactions
+FOR EACH ROW
+BEGIN
+    IF NEW.ReturnDate IS NULL THEN
+        SET NEW.ReturnDate = NULL;
+    END IF;
+END;
+
+-- Trigger for Fines table: Ensure that the fine amount is non-negative
+CREATE TRIGGER trg_EnforceNonNegativeFine
+BEFORE INSERT ON Fines
+FOR EACH ROW
+BEGIN
+    IF NEW.Amount < 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Fine amount must be non-negative.';
+    END IF;
+END;
+
+
+-- Insert data into Authors table
+DECLARE
+    v_author_id INT;
+    v_author_name VARCHAR2(100);
+BEGIN
+    -- Get user input for Authors table
+    v_author_id := &1; -- Prompt for AuthorID
+    v_author_name := '&2'; -- Prompt for AuthorName
+
+    INSERT INTO Authors (AuthorID, AuthorName)
+    VALUES (v_author_id, v_author_name);
+    COMMIT;
+    DBMS_OUTPUT.PUT_LINE('Author data inserted successfully.');
+END;
+
+-- Insert data into Books table
+DECLARE
+    v_book_id INT;
+    v_title VARCHAR2(255);
+    v_isbn VARCHAR2(20);
+    v_author_id INT;
+BEGIN
+    -- Get user input for Books table
+    v_book_id := &3; -- Prompt for BookID
+    v_title := '&4'; -- Prompt for Title
+    v_isbn := '&5'; -- Prompt for ISBN
+    v_author_id := &6; -- Prompt for AuthorID
+
+    INSERT INTO Books (BookID, Title, ISBN, AuthorID)
+    VALUES (v_book_id, v_title, v_isbn, v_author_id);
+    COMMIT;
+    DBMS_OUTPUT.PUT_LINE('Book data inserted successfully.');
+END;
+
+-- Insert data into Members table
+DECLARE
+    v_member_id INT;
+    v_member_name VARCHAR2(100);
+    v_email VARCHAR2(100);
+BEGIN
+    -- Get user input for Members table
+    v_member_id := &7; -- Prompt for MemberID
+    v_member_name := '&8'; -- Prompt for MemberName
+    v_email := '&9'; -- Prompt for Email
+
+    INSERT INTO Members (MemberID, MemberName, Email)
+    VALUES (v_member_id, v_member_name, v_email);
+    COMMIT;
+    DBMS_OUTPUT.PUT_LINE('Member data inserted successfully.');
+END;
+
+-- Insert data into Transactions table
+DECLARE
+    v_transaction_id INT;
+    v_book_id INT;
+    v_member_id INT;
+    v_checkout_date DATE;
+    v_return_date DATE;
+BEGIN
+    -- Get user input for Transactions table
+    v_transaction_id := &10; -- Prompt for TransactionID
+    v_book_id := &11; -- Prompt for BookID
+    v_member_id := &12; -- Prompt for MemberID
+    v_checkout_date := TO_DATE('&13', 'YYYY-MM-DD'); -- Prompt for CheckoutDate
+    v_return_date := TO_DATE('&14', 'YYYY-MM-DD'); -- Prompt for ReturnDate
+
+    INSERT INTO Transactions (TransactionID, BookID, MemberID, CheckoutDate, ReturnDate)
+    VALUES (v_transaction_id, v_book_id, v_member_id, v_checkout_date, v_return_date);
+    COMMIT;
+    DBMS_OUTPUT.PUT_LINE('Transaction data inserted successfully.');
+END;
+
+-- Insert data into Fines table
+DECLARE
+    v_fine_id INT;
+    v_transaction_id INT;
+    v_amount DECIMAL(10, 2);
+    v_paid BOOLEAN;
+BEGIN
+    -- Get user input for Fines table
+    v_fine_id := &15; -- Prompt for FineID
+    v_transaction_id := &16; -- Prompt for TransactionID
+    v_amount := &17; -- Prompt for Amount
+    v_paid := '&18' = 'TRUE'; -- Prompt for Paid (TRUE/FALSE)
+
+    INSERT INTO Fines (FineID, TransactionID, Amount, Paid)
+    VALUES (v_fine_id, v_transaction_id, v_amount, v_paid);
+    COMMIT;
+    DBMS_OUTPUT.PUT_LINE('Fine data inserted successfully.');
+END;
