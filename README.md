@@ -59,3 +59,43 @@ The Cafeteria Management System is a relational database management system (RDBM
 ---
 
 This summary highlights the key components and functionalities of the Cafeteria Management System, demonstrating its ability to streamline operations and improve customer satisfaction in a cafeteria setting.
+
+---
+# Library Management System
+
+## Overview
+
+The Library Management System is a database application designed to streamline library operations by efficiently managing books, authors, members, transactions, and fines. This project utilizes SQL to create a robust database schema, implement views for data retrieval, define triggers for enforcing data integrity, and provide procedures for user-friendly data insertion.
+
+## Features
+
+- **Database Schema:** Defines tables for Authors, Books, Members, Transactions, and Fines with appropriate fields to store comprehensive information.
+- **Views:** Offers simplified access to data through views such as Author Information, Book Details with Author, Member Profiles, Transaction Records, and Fine Details with Transaction Information.
+- **Triggers:** Enforces data integrity rules to maintain database consistency, including prevention of author deletion associated with books, insertion of books with valid authors, avoidance of duplicate member emails, and ensuring accurate transaction details.
+- **User Input Inserts:** Implements procedures for user interaction to facilitate seamless data insertion into the database, enhancing usability and data entry efficiency.
+
+## Files Structure
+
+- `schema.sql`: Contains SQL scripts for creating the database schema, including tables, views, and triggers, and inserting initial data.
+- `user_input_inserts.sql`: Provides SQL code for procedures facilitating user-driven data insertion into the database.
+- `README.md`: Presents an overview of the project, its features, usage instructions, and contribution guidelines.
+
+## Usage
+
+1. **Database Setup:** Execute the SQL code in `schema.sql` to create the database structure, including tables, views, and triggers.
+2. **Data Insertion:** Optionally, use the SQL code in `user_input_inserts.sql` to insert data into the database using user-friendly prompts.
+3. **Interact with Database:** Utilize SQL queries to interact with the database, retrieve information, perform operations, and manage library resources effectively.
+
+## Contribution Guidelines
+
+Contributions to enhance and improve the Library Management System project are highly encouraged! Please follow these guidelines when contributing:
+
+- Open issues to report bugs, suggest new features, or propose enhancements.
+- Submit pull requests to address identified issues, introduce new features, or improve existing functionalities.
+- Ensure adherence to coding standards, maintain clarity, and provide comprehensive documentation for all changes made.
+- Collaborate respectfully and follow the project's code of conduct to foster a positive and inclusive community environment.
+
+## License
+
+The Library Management System project is licensed under the MIT License. See the [LICENSE](LICENSE) file for detailed license information.
+
